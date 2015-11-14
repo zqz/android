@@ -1,6 +1,7 @@
 package ca.zqz.app.logic;
 
 import com.google.gson.GsonBuilder;
+import com.squareup.okhttp.HttpUrl;
 import com.squareup.okhttp.MediaType;
 import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.Request;
@@ -19,24 +20,34 @@ public class Login {
     OkHttpClient client = new OkHttpClient();
 
     public String endpoint;
+    public HttpUrl endpointUrl;
     private User user;
+
+    public Login() {
+        endpointUrl = HttpUrl.parse("http://zqz.ca/" + endpoint);
+    }
 
     public boolean login() {
         try {
-            Response authResponse = post(endpoint);
-
+            Response authResponse = post();
             if (authResponse.code() == 202) {
                 String response = authResponse.body().string();
+
+                System.out.println(response);
 
                 Gson g = new Gson();
                 user = g.fromJson(response, User.class);
                 return true;
             }
         } catch (IOException e) {
-            // no good!
+            System.out.println("Failed to login: " + e.getMessage());
         }
 
         return false;
+    }
+
+    public void setEndpointUrl(HttpUrl endpointUrl) {
+        this.endpointUrl = endpointUrl;
     }
 
     public User getUser() {
@@ -51,11 +62,11 @@ public class Login {
         return gson.toJson(this);
     }
 
-    private Response post(String url) throws IOException {
+    private Response post() throws IOException {
         String json = this.toJson();
         RequestBody body = RequestBody.create(JSON, json);
         Request request = new Request.Builder()
-                .url("http://zqz.ca/" + url)
+                .url(endpointUrl)
                 .post(body)
                 .build();
         return client.newCall(request).execute();

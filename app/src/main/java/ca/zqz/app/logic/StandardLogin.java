@@ -3,7 +3,7 @@ package ca.zqz.app.logic;
 import com.google.gson.annotations.Expose;
 
 public class StandardLogin extends Login {
-    private String endpoint = "/sessions/login";
+    public String endpoint = "/sessions/login";
 
     @Expose
     private String login;
@@ -11,6 +11,8 @@ public class StandardLogin extends Login {
     private String password;
 
     public StandardLogin(String login, String password) {
+        super();
+
         this.login = login;
         this.password = password;
     }
